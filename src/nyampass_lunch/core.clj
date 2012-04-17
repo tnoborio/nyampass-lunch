@@ -15,17 +15,21 @@
 (def restaurants-path "/Users/tokusei/work/nyampass/nyampass-lunch/restaurants")
 
 (defn parse-mention-text [text]
+  (prn :mention text)
   (let [fields (strings/split text #" +")]
     (if (= (second fields)
            "削除")
       {:action :remove
        :data {:name (nth fields 2)}}
       (let [[_ restarutant-name & [weight]] fields]
-        (when restarutant-name
-          {:action :add
-           :data {:name restarutant-name
-                  :weight (or (and weight (Integer/parseInt weight))
-                              1)}})))))
+        (try
+          (when restarutant-name
+            {:action :add
+             :data {:name restarutant-name
+                    :weight (or (and weight (Integer/parseInt weight))
+                                1)}})
+          (catch NumberFormatException e nil))))))
+            
 
 (defn mentions [twitter-instance]
   (let [texts (twitter/mention-texts twitter-instance)]
@@ -50,7 +54,8 @@
         twitter-instance (twitter/twitter token twitter-config)]
     (case (keyword mode)
           :mentions (mentions twitter-instance)
+          :test (prn (restaurants/decide))
           (tweet twitter-instance))))
 
 ;; (-main "mentions")
-;; (-main)
+;; (-main "test")

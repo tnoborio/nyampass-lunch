@@ -13,6 +13,15 @@
   (r/add! :name "はまずし")
   (is (= (count (r/restaurants)) 1)))
 
+(deftest decide-by-weight-restaurants-test
+  (r/reset-restaurants!)
+  (r/add! :name "はまずし" :weight 3)
+  (r/add! :name "はなまるうどん" :weight 1)
+  (let [decides (frequencies (for [_ (range 100)] (:name (r/decide))))]
+    (is (get decides "はまずし"))
+    (is (get decides "はなまるうどん"))
+    (is (> (get decides "はまずし") (get decides "はなまるうどん")))))
+
 (deftest remove-restaurant-test
   (r/reset-restaurants!)
   (r/add! :name "はまずし")
